@@ -3,220 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simple Quiz App</title>
+  <title>Static Weather Dashboard</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      background: #f5f7fa;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #34495e;
-      margin-bottom: 20px;
-    }
-
-    form {
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      margin: 0;
+      padding: 0;
       display: flex;
-      flex-direction: column;
-      gap: 25px;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .question {
-      font-weight: 600;
-      color: #2c3e50;
+    .weather-dashboard {
+      background-color: rgba(255, 255, 255, 0.85);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      max-width: 350px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .city {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #34495e;
       margin-bottom: 10px;
     }
 
-    .answers label {
-      display: block;
-      margin-bottom: 6px;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-      border: 1px solid transparent;
+    .temperature {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #e67e22;
+      margin: 10px 0;
     }
 
-    /* Hover effect for answers */
-    .answers label:hover {
-      background-color: #ecf0f1;
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 15px auto;
     }
 
-    /* Correct answer */
-    .correct {
-      background-color: #d4edda !important;
-      border-color: #28a745 !important;
-      color: #155724;
+    .description {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #2980b9;
+      text-transform: capitalize;
+      margin-bottom: 20px;
     }
 
-    /* Incorrect answer */
-    .incorrect {
-      background-color: #f8d7da !important;
-      border-color: #dc3545 !important;
-      color: #721c24;
+    .details {
+      display: flex;
+      justify-content: space-around;
+      font-size: 1rem;
+      color: #7f8c8d;
     }
 
-    button {
-      padding: 12px;
-      font-size: 18px;
-      background-color: #2980b9;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      align-self: center;
-      width: 150px;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #1c5980;
-    }
-
-    #result {
-      margin-top: 25px;
-      font-weight: bold;
-      font-size: 20px;
+    .detail-item {
       text-align: center;
+    }
+
+    .detail-item span {
+      display: block;
+      font-weight: 700;
       color: #2c3e50;
+      margin-bottom: 5px;
+    }
+  
+    @media (max-width: 400px) {
+      .weather-dashboard {
+        padding: 20px 25px;
+      }
+
+      .temperature {
+        font-size: 3rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h2>Simple Quiz App</h2>
+  <section class="weather-dashboard" aria-label="Current weather information">
+    <div class="city" id="city">City Name</div>
+    <img src="" alt="Weather Icon" class="weather-icon" id="weatherIcon" />
+    <div class="temperature" id="temperature">--°C</div>
+    <div class="description" id="description">Weather Description</div>
 
-  <form id="quizForm">
-    <!-- Questions will be inserted here dynamically -->
-  </form>
-
-  <button id="submitBtn">Submit Quiz</button>
-
-  <div id="result"></div>
+    <div class="details">
+      <div class="detail-item">
+        <span id="humidity">--%</span>
+        Humidity
+      </div>
+      <div class="detail-item">
+        <span id="windSpeed">-- km/h</span>
+        Wind Speed
+      </div>
+      <div class="detail-item">
+        <span id="pressure">-- hPa</span>
+        Pressure
+      </div>
+    </div>
+  </section>
 
   <script>
-    const quizData = [
-      {
-        question: "Which language runs in a web browser?",
-        options: ["Java", "C", "Python", "JavaScript"],
-        correct: 3
-      },
-      {
-        question: "What does CSS stand for?",
-        options: ["Central Style Sheets", "Cascading Style Sheets", "Cascading Simple Sheets", "Cars SUVs Sailboats"],
-        correct: 1
-      },
-      {
-        question: "What does HTML stand for?",
-        options: ["Hypertext Markup Language", "Hyperloop Machine Language", "Hypertext Markdown Language", "Helicopters Terminals Motorboats Lamborginis"],
-        correct: 0
-      },
-      {
-        question: "What year was JavaScript launched?",
-        options: ["1996", "1995", "1994", "None of the above"],
-        correct: 1
-      }
-    ];
+    // Static weather data object
+    const weatherData = {
+      city: "Puttur",
+      temperature: 18,
+      description: "clear sky",
+      icon: "01d",  // OpenWeatherMap icon code example
+      humidity: 72,
+      windSpeed: 15, // km/h
+      pressure: 1013 // hPa
+    };
 
-    const form = document.getElementById('quizForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const resultDiv = document.getElementById('result');
+    // Function to update the dashboard with weatherData
+    function updateWeatherDashboard(data) {
+      document.getElementById('city').textContent = data.city;
+      document.getElementById('temperature').textContent = `${data.temperature}°C`;
+      document.getElementById('description').textContent = data.description;
+      document.getElementById('humidity').textContent = `${data.humidity}%`;
+      document.getElementById('windSpeed').textContent = `${data.windSpeed} km/h`;
+      document.getElementById('pressure').textContent = `${data.pressure} hPa`;
 
-    // Render quiz questions and options dynamically
-    function renderQuiz() {
-      quizData.forEach((q, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.classList.add('question-block');
-
-        // Question text
-        const questionEl = document.createElement('div');
-        questionEl.classList.add('question');
-        questionEl.textContent = `${index + 1}. ${q.question}`;
-        questionDiv.appendChild(questionEl);
-
-        // Options container
-        const answersDiv = document.createElement('div');
-        answersDiv.classList.add('answers');
-
-        q.options.forEach((option, i) => {
-          const label = document.createElement('label');
-
-          const radio = document.createElement('input');
-          radio.type = 'radio';
-          radio.name = `question${index}`;
-          radio.value = i;
-
-          label.appendChild(radio);
-          label.appendChild(document.createTextNode(option));
-
-          answersDiv.appendChild(label);
-        });
-
-        questionDiv.appendChild(answersDiv);
-        form.appendChild(questionDiv);
-      });
+      // OpenWeatherMap icons URL pattern: https://openweathermap.org/img/wn/{icon}@2x.png
+      const iconUrl = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+      const iconImg = document.getElementById('weatherIcon');
+      iconImg.src = iconUrl;
+      iconImg.alt = `Weather icon showing ${data.description}`;
     }
 
-    function clearHighlights() {
-      const labels = form.querySelectorAll('label');
-      labels.forEach(label => {
-        label.classList.remove('correct', 'incorrect');
-      });
-    }
-
-    submitBtn.addEventListener('click', () => {
-      clearHighlights();
-      let score = 0;
-      let answeredAll = true;
-
-      quizData.forEach((q, index) => {
-        const selected = form.querySelector(`input[name="question${index}"]:checked`);
-
-        if (!selected) {
-          answeredAll = false;
-          return;
-        }
-
-        const selectedValue = Number(selected.value);
-        const labels = form.querySelectorAll(`input[name="question${index}"]`);
-
-        // Highlight answers
-        labels.forEach(input => {
-          const label = input.parentElement;
-
-          if (Number(input.value) === q.correct) {
-            label.classList.add('correct');
-          }
-
-          if (input === selected && selectedValue !== q.correct) {
-            label.classList.add('incorrect');
-          }
-        });
-
-        if (selectedValue === q.correct) {
-          score++;
-        }
-      });
-
-      if (!answeredAll) {
-        resultDiv.textContent = "Please answer all questions before submitting.";
-        resultDiv.style.color = '#e74c3c';
-        return;
-      }
-
-      resultDiv.style.color = '#27ae60';
-      resultDiv.textContent = `You scored ${score} out of ${quizData.length}!`;
-    });
-
-    // Initialize
-    renderQuiz();
+    // Initialize dashboard on page load
+    updateWeatherDashboard(weatherData);
   </script>
-
+  
 </body>
 </html>
