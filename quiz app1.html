@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Quiz App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      background: #f5f7fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #34495e;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .question {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .answers label {
+      display: block;
+      margin-bottom: 6px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    /* Hover effect for answers */
+    .answers label:hover {
+      background-color: #ecf0f1;
+    }
+
+    /* Correct answer */
+    .correct {
+      background-color: #d4edda !important;
+      border-color: #28a745 !important;
+      color: #155724;
+    }
+
+    /* Incorrect answer */
+    .incorrect {
+      background-color: #f8d7da !important;
+      border-color: #dc3545 !important;
+      color: #721c24;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 18px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      align-self: center;
+      width: 150px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1c5980;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-weight: bold;
+      font-size: 20px;
+      text-align: center;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Simple Quiz App</h2>
+
+  <form id="quizForm">
+    <!-- Questions will be inserted here dynamically -->
+  </form>
+
+  <button id="submitBtn">Submit Quiz</button>
+
+  <div id="result"></div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
+        correct: 3
+      },
+      {
+        question: "What does CSS stand for?",
+        options: ["Central Style Sheets", "Cascading Style Sheets", "Cascading Simple Sheets", "Cars SUVs Sailboats"],
+        correct: 1
+      },
+      {
+        question: "What does HTML stand for?",
+        options: ["Hypertext Markup Language", "Hyperloop Machine Language", "Hypertext Markdown Language", "Helicopters Terminals Motorboats Lamborginis"],
+        correct: 0
+      },
+      {
+        question: "What year was JavaScript launched?",
+        options: ["1996", "1995", "1994", "None of the above"],
+        correct: 1
+      }
+    ];
+
+    const form = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultDiv = document.getElementById('result');
+
+    // Render quiz questions and options dynamically
+    function renderQuiz() {
+      quizData.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question-block');
+
+        // Question text
+        const questionEl = document.createElement('div');
+        questionEl.classList.add('question');
+        questionEl.textContent = `${index + 1}. ${q.question}`;
+        questionDiv.appendChild(questionEl);
+
+        // Options container
+        const answersDiv = document.createElement('div');
+        answersDiv.classList.add('answers');
+
+        q.options.forEach((option, i) => {
+          const label = document.createElement('label');
+
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `question${index}`;
+          radio.value = i;
+
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(option));
+
+          answersDiv.appendChild(label);
+        });
+
+        questionDiv.appendChild(answersDiv);
+        form.appendChild(questionDiv);
+      });
+    }
+
+    function clearHighlights() {
+      const labels = form.querySelectorAll('label');
+      labels.forEach(label => {
+        label.classList.remove('correct', 'incorrect');
+      });
+    }
+
+    submitBtn.addEventListener('click', () => {
+      clearHighlights();
+      let score = 0;
+      let answeredAll = true;
+
+      quizData.forEach((q, index) => {
+        const selected = form.querySelector(`input[name="question${index}"]:checked`);
+
+        if (!selected) {
+          answeredAll = false;
+          return;
+        }
+
+        const selectedValue = Number(selected.value);
+        const labels = form.querySelectorAll(`input[name="question${index}"]`);
+
+        // Highlight answers
+        labels.forEach(input => {
+          const label = input.parentElement;
+
+          if (Number(input.value) === q.correct) {
+            label.classList.add('correct');
+          }
+
+          if (input === selected && selectedValue !== q.correct) {
+            label.classList.add('incorrect');
+          }
+        });
+
+        if (selectedValue === q.correct) {
+          score++;
+        }
+      });
+
+      if (!answeredAll) {
+        resultDiv.textContent = "Please answer all questions before submitting.";
+        resultDiv.style.color = '#e74c3c';
+        return;
+      }
+
+      resultDiv.style.color = '#27ae60';
+      resultDiv.textContent = `You scored ${score} out of ${quizData.length}!`;
+    });
+
+    // Initialize
+    renderQuiz();
+  </script>
+
+</body>
+</html>
